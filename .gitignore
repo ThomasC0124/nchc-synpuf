@@ -1,0 +1,3 @@
+*.pyc
+rawdata/
+.pytest_cache/
