@@ -1,0 +1,111 @@
+{
+  "memberID": {
+    "origName": "DESYNPUF_ID"
+  },
+  "DOB": {
+    "origName": "BENE_BIRTH_DT"
+  },
+  "DOD": {
+    "origName": "BENE_DEATH_DT"
+  },
+  "gender": {
+    "origName": "BENE_SEX_IDENT_CD",
+    "valueMap": {
+      "1": "male",
+      "2": "female"
+    }
+  },
+  "race": {
+    "origName": "BENE_RACE_CD",
+    "valueMap": {
+      "1": "white",
+      "2": "black",
+      "3": "others",
+      "5": "hispanic"
+    }
+  },
+  "ESRDStatus": {
+    "origName": "BENE_ESRD_IND",
+    "valueMap": {
+      "0": false,
+      "Y": true
+    }
+  },
+  "Alzheimer": {
+    "origName": "SP_ALZHDMTA",
+    "valueMap": {
+      "1": true,
+      "2": false
+    }
+  },
+  "CHF": {
+    "origName": "SP_CHF",
+    "valueMap": {
+      "1": true,
+      "2": false
+    }
+  },
+  "CKD": {
+    "origName": "SP_CHRNKIDN",
+    "valueMap": {
+      "1": true,
+      "2": false
+    }
+  },
+  "cancer": {
+    "origName": "SP_CNCR",
+    "valueMap": {
+      "1": true,
+      "2": false
+    }
+  },
+  "COPD": {
+    "origName": "SP_COPD",
+    "valueMap": {
+      "1": true,
+      "2": false
+    }
+  },
+  "depression": {
+    "origName": "SP_DEPRESSN",
+    "valueMap": {
+      "1": true,
+      "2": false
+    }
+  },
+  "diabetes": {
+    "origName": "SP_DIABETES",
+    "valueMap": {
+      "1": true,
+      "2": false
+    }
+  },
+  "ischemicHD": {
+    "origName": "SP_ISCHMCHT",
+    "valueMap": {
+      "1": true,
+      "2": false
+    }
+  },
+  "osteoporosis": {
+    "origName": "SP_OSTEOPRS",
+    "valueMap": {
+      "1": true,
+      "2": false
+    }
+  },
+  "RAOA": {
+    "origName": "SP_RA_OA",
+    "valueMap": {
+      "1": true,
+      "2": false
+    }
+  },
+  "stroke": {
+    "origName": "SP_STRKETIA",
+    "valueMap": {
+      "1": true,
+      "2": false
+    }
+  }
+}
