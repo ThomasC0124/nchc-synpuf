@@ -1,6 +1,8 @@
+import os
 import pytest
 
-from preprocessing.parser import Parser, BeneficiarySummaryParser
+from preprocessing.parser import Parser
+from preprocessing.beneficiary import BeneficiarySummaryParser
 
 def test_instantiate_parser(fake_header_fn):
     parser = Parser('./meta_folder/meta_header_ref.json')
@@ -18,17 +20,16 @@ def test_instantiate_beneficiary_summary_parser(beneficiary_summary_header_fn, f
 def test_beneficiary_summary_parser_data_io_on_sample(beneficiary_summary_header_fn,
                                                       sample_beneficiary_summary_data_fn):
     parser = BeneficiarySummaryParser(beneficiary_summary_header_fn)
-    parser.open_data_file(sample_beneficiary_summary_data_fn)
-    _ = next(parser.data_handle)
-    # TODO: change to parser.parse_data(fn_out)
-    # TODO: check output file is created at `fn_out`
-    parser.close_data_file()
-    with pytest.raises(ValueError):
-        _ = next(parser.data_handle)    # should not be able to iterate through file since it's closed
+    parser.add_data_file(sample_beneficiary_summary_data_fn)
+    fn_out = './tests/sample_bene_summary.json'
+    parser.parse_data(fn_out)
+    assert os.path.isfile(fn_out)
+    os.remove(fn_out)
 
 def test_beneficiary_summary_parser_data_io_on_fake(beneficiary_summary_header_fn,
                                                     fake_beneficiary_summary_data_fn):
     parser = BeneficiarySummaryParser(beneficiary_summary_header_fn)
-    with pytest.raises(IOError):
-        parser.open_data_file(fake_beneficiary_summary_data_fn)
-    parser.close_data_file()    # do nothing
+    parser.add_data_file(fake_beneficiary_summary_data_fn)
+    # TODO: make sure logging messages are generated
+    fn_out = './tests/sample_bene_summary.json'
+    parser.parse_data(fn_out)
