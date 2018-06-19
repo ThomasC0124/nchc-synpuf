@@ -17,6 +17,7 @@ class BeneficiarySummaryParser(Parser):
         assert self._ref_header is not None, self.logger.error('reference header not loaded')
 
     def combine_data(self, fn_ins_by_year):
+        """Group `fn_ins_by_year` by member ID to create member-level summary"""
         time_started = datetime.now()
         combined_data = defaultdict(lambda: defaultdict(dict))
         for year, fn_in in fn_ins_by_year.iteritems():
