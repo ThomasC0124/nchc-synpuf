@@ -67,7 +67,6 @@ class Parser(object):
             member_id = parsed_line.pop('memberID', 'NA')
             if member_id != 'NA':
                 parsed_data[member_id] = parsed_line
-        self.logger.info('time spent parsing: {} seconds'.format(time_spent.total_seconds()))
         with open(fn_out, 'w') as fp_out:
             for member_id, member_doc in parsed_data.iteritems():
                 member_doc['memberID'] = member_id
