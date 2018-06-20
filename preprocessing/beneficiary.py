@@ -2,7 +2,6 @@ import json
 import logging
 
 from collections import defaultdict
-from datetime import datetime
 
 from parser import Parser
 
@@ -18,7 +17,6 @@ class BeneficiarySummaryParser(Parser):
 
     def combine_data(self, fn_ins_by_year):
         """Group `fn_ins_by_year` by member ID to create member-level summary"""
-        time_started = datetime.now()
         combined_data = defaultdict(lambda: defaultdict(dict))
         for year, fn_in in fn_ins_by_year.iteritems():
             with open(fn_in, 'r') as fp:
@@ -38,6 +36,4 @@ class BeneficiarySummaryParser(Parser):
                                         )
                                     )
                                 combined_data[member_id][field] = val
-        time_spent = datetime.now() - time_started
-        self.logger.info('time spent combining: {} seconds'.format(time_spent.total_seconds()))
         return combined_data

@@ -3,7 +3,6 @@ import json
 import logging
 
 from collections import deque, defaultdict
-from datetime import datetime
 
 class Parser(object):
     def __init__(self, ref_header_fn):
@@ -52,7 +51,6 @@ class Parser(object):
 
     def parse_data(self, fn_out):
         """Parse the opened self._data_handle and save the dictionary-like result to `fn_out`"""
-        time_started = datetime.now()
         self._open_data_file()
         if self._data_handle is None:
             self.logger.warning('unable to parse data since data file is not opened')
@@ -69,16 +67,12 @@ class Parser(object):
             member_id = parsed_line.pop('memberID', 'NA')
             if member_id != 'NA':
                 parsed_data[member_id] = parsed_line
-        time_spent = datetime.now() - time_started
         self.logger.info('time spent parsing: {} seconds'.format(time_spent.total_seconds()))
-        time_started = datetime.now()
         with open(fn_out, 'w') as fp_out:
             for member_id, member_doc in parsed_data.iteritems():
                 member_doc['memberID'] = member_id
                 fp_out.write(json.dumps(member_doc)+'\n')
         self._close_data_file()
-        time_spent = datetime.now() - time_started
-        self.logger.info('time spent dumping: {} seconds'.format(time_spent.total_seconds()))
 
     def _parse_raw_line(self, raw_line, header, ref):
         """Parse single list-like `raw_line` into dictionary according to `header` and `ref`"""

@@ -1,8 +1,6 @@
 import ntpath
 import logging
 
-from datetime import datetime
-
 from parser import Parser
 
 class ClaimParser(Parser):
