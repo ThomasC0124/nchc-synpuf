@@ -1,3 +1,4 @@
+import os
 import csv
 import json
 import logging
@@ -70,7 +71,7 @@ class Parser(object):
                 member_id = parsed_line.pop('memberID', 'NA')
                 if member_id != 'NA':
                     parsed_data[member_id] = parsed_line
-            filename, ext = next_data_file.split('.')
+            filename, ext = os.path.splitext(next_data_file)
             fn_out = '{}_parsed.{}'.format(filename, ext)
             with open(fn_out, 'w') as fp_out:
                 for member_id, member_doc in parsed_data.iteritems():
