@@ -34,9 +34,8 @@ class Parser(object):
         except ValueError as ve:
             self.logger.warning(ve, exc_info=True)
 
-    def _open_data_file(self):
-        """Try to open the right-most file in the queue and assign it to self._data_handle"""
-        data_file = self.pop_data_file()
+    def _open_data_file(self, data_file):
+        """Try to open `data_file` and assign it to self._data_handle"""
         try:
             self._data_handle = open(data_file, 'rb')
         except TypeError as te: # when `data_file` is None
@@ -48,30 +47,33 @@ class Parser(object):
         """Close the buffer self._data_handle"""
         if self._data_handle:
             self._data_handle.close()
+            self._data_handle = None
 
     def parse_data(self, fn_out):
         """Parse the opened self._data_handle and save the dictionary-like result to `fn_out`"""
-        self._open_data_file()
-        if self._data_handle is None:
-            self.logger.warning('unable to parse data since data file is not opened')
-            return
-        if not hasattr(self, '_ref_header') or self._ref_header is None:
-            self.logger.warning(
-                'unable to parse data since the reference header has not yet been loaded'
-            )
-        parsed_data = {}
-        reader = self._create_csv_reader(self._data_handle, ',')
-        header = reader.next()
-        for raw_line in reader:
-            parsed_line = self._parse_raw_line(raw_line, header, self._ref_header)
-            member_id = parsed_line.pop('memberID', 'NA')
-            if member_id != 'NA':
-                parsed_data[member_id] = parsed_line
-        with open(fn_out, 'w') as fp_out:
-            for member_id, member_doc in parsed_data.iteritems():
-                member_doc['memberID'] = member_id
-                fp_out.write(json.dumps(member_doc)+'\n')
-        self._close_data_file()
+        while len(self._file_queue) > 0:
+            next_data_file = self.pop_data_file()
+            self._open_data_file(next_data_file)
+            if self._data_handle is None:
+                self.logger.warning('unable to parse data since data file is not opened')
+                return
+            if not hasattr(self, '_ref_header') or self._ref_header is None:
+                self.logger.warning(
+                    'unable to parse data since the reference header has not yet been loaded'
+                )
+            parsed_data = {}
+            reader = self._create_csv_reader(self._data_handle, ',')
+            header = reader.next()
+            for raw_line in reader:
+                parsed_line = self._parse_raw_line(raw_line, header, self._ref_header)
+                member_id = parsed_line.pop('memberID', 'NA')
+                if member_id != 'NA':
+                    parsed_data[member_id] = parsed_line
+            with open(fn_out, 'w') as fp_out:
+                for member_id, member_doc in parsed_data.iteritems():
+                    member_doc['memberID'] = member_id
+                    fp_out.write(json.dumps(member_doc)+'\n')
+            self._close_data_file()
 
     def _parse_raw_line(self, raw_line, header, ref):
         """Parse single list-like `raw_line` into dictionary according to `header` and `ref`"""
@@ -98,6 +100,7 @@ class Parser(object):
         reader = csv.reader(fp, delimiter=delimiter)
         return reader
 
+    # TODO: load header JSONs from the preprocessing module directly and then add them to the parser
     def _load_ref_header(self):
         """Load self.ref_header_fn into memory and assign it to self._ref_header"""
         self._ref_header = None
