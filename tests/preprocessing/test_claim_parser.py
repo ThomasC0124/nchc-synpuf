@@ -18,3 +18,9 @@ def test_instantiate_inpatient_claim_parser(inpatient_claim_parser, inpatient_cl
         parser = ClaimParser('outpatient', inpatient_claim_header_fn)
     with pytest.raises(AssertionError):
         parser = ClaimParser('fake', fake_header_fn)
+
+def test_inpatient_claim_parser_method_parse_data():
+    assert False
+
+def test_inpatient_claim_parser_method_merge_claim_lines():
+    assert False
