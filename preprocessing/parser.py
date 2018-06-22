@@ -49,8 +49,9 @@ class Parser(object):
             self._data_handle.close()
             self._data_handle = None
 
-    def parse_data(self, fn_out):
-        """Parse the opened self._data_handle and save the dictionary-like result to `fn_out`"""
+    def parse_data(self):
+        """Parse the data files stored in self._file_queue and return a list of parsed file names"""
+        parsed_files = []
         while len(self._file_queue) > 0:
             next_data_file = self.pop_data_file()
             self._open_data_file(next_data_file)
@@ -69,11 +70,15 @@ class Parser(object):
                 member_id = parsed_line.pop('memberID', 'NA')
                 if member_id != 'NA':
                     parsed_data[member_id] = parsed_line
+            filename, ext = next_data_file.split('.')
+            fn_out = '{}_parsed.{}'.format(filename, ext)
             with open(fn_out, 'w') as fp_out:
                 for member_id, member_doc in parsed_data.iteritems():
                     member_doc['memberID'] = member_id
                     fp_out.write(json.dumps(member_doc)+'\n')
+            parsed_files.append(fn_out)
             self._close_data_file()
+        return parsed_files
 
     def _parse_raw_line(self, raw_line, header, ref):
         """Parse single list-like `raw_line` into dictionary according to `header` and `ref`"""
