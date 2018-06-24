@@ -2,7 +2,7 @@ import os
 import pytest
 import logging
 
-from preprocessing.beneficiary import BeneficiarySummaryParser
+from preprocessing import BeneficiarySummaryParser
 
 logging.basicConfig(level=logging.DEBUG)
 

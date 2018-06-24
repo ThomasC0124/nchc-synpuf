@@ -2,7 +2,7 @@ import os
 import pytest
 import logging
 
-from preprocessing.claim import ClaimParser
+from preprocessing import ClaimParser
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -19,7 +19,7 @@ def test_instantiate_inpatient_claim_parser(inpatient_claim_parser, inpatient_cl
     with pytest.raises(AssertionError):
         parser = ClaimParser('fake', fake_header_fn)
 
-def test_inpatient_claim_parser_method_parse_data():
+def test_inpatient_claim_parser_method_parse_data(inpatient_claim_parser):
     assert False
 
 def test_inpatient_claim_parser_method_merge_claim_lines():
