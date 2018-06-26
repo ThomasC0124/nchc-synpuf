@@ -33,5 +33,25 @@ def test_inpatient_claim_parser_method_parse_data(inpatient_claim_parser,
                 assert k in line
     os.remove(fn_outs[0])
 
-def test_inpatient_claim_parser_method_merge_claim_lines():
-    assert False
+def test_inpatient_claim_parser_method_merge_claim_lines(inpatient_claim_parser,
+                                                         sample_inpatient_claim_data_fn):
+    inpatient_claim_parser.add_data_file(sample_inpatient_claim_data_fn)
+    fn_outs = inpatient_claim_parser.parse_data()
+    for fn_out in fn_outs:
+        inpatient_claim_parser.add_data_file(fn_out)
+    inpatient_claim_parser.merge_claim_lines()
+    # TODO: temporary tests
+    assert os.path.isfile('./temp_claim_lines_sorted.txt')
+    os.remove('./temp_claim_lines_sorted.txt')
+    # TODO: test "_merge_claim_lines_by_claim_id", "_to_dump_container" and "_clean_up_container"
+
+def test_inpatient_claim_parser_method_merge_claim_lines_on_wrong_context_format(inpatient_claim_parser,
+                                                                                 sample_inpatient_claim_data_fn):
+    inpatient_claim_parser.add_data_file(sample_inpatient_claim_data_fn)
+    with pytest.raises(ValueError):
+        inpatient_claim_parser.merge_claim_lines()
+
+@pytest.fixture
+def outpatient_claim_parser(outpatient_claim_header_fn):
+    parser = ClaimParser('outpatient', outpatient_claim_header_fn)
+    return parser
