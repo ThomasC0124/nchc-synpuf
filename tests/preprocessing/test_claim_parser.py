@@ -48,13 +48,12 @@ def test_inpatient_claim_parser_method_merge_claim_lines(inpatient_claim_parser,
         elif i == 1:
             assert claim['claimID'] == '293911115441577'
 
-    # TODO: test "_merge_claim_lines_by_claim_id", "_to_dump_container" and "_clean_up_container"
-
 def test_inpatient_claim_parser_method_merge_claim_lines_on_wrong_context_format(inpatient_claim_parser,
                                                                                  sample_inpatient_claim_data_fn):
     inpatient_claim_parser.add_data_file(sample_inpatient_claim_data_fn)
     with pytest.raises(ValueError):
         inpatient_claim_parser.merge_claim_lines()
+    os.remove('./temp_claim_lines_to_sort.txt')
 
 @pytest.fixture
 def outpatient_claim_parser(outpatient_claim_header_fn):
