@@ -63,20 +63,21 @@ class Parser(object):
                 self.logger.warning(
                     'unable to parse data since the reference header has not yet been loaded'
                 )
-            parsed_data = {}
+            parsed_data = defaultdict(list)
             reader = self._create_csv_reader(self._data_handle, ',')
             header = reader.next()
             for raw_line in reader:
                 parsed_line = self._parse_raw_line(raw_line, header, self._ref_header)
                 member_id = parsed_line.pop('memberID', 'NA')
                 if member_id != 'NA':
-                    parsed_data[member_id] = parsed_line
+                    parsed_data[member_id].append(parsed_line)
             filename, ext = os.path.splitext(next_data_file)
-            fn_out = '{}_parsed.{}'.format(filename, ext)
+            fn_out = '{}_parsed{}'.format(filename, ext)
             with open(fn_out, 'w') as fp_out:
-                for member_id, member_doc in parsed_data.iteritems():
-                    member_doc['memberID'] = member_id
-                    fp_out.write(json.dumps(member_doc)+'\n')
+                for member_id, member_docs in parsed_data.iteritems():
+                    for member_doc in member_docs:
+                        member_doc['memberID'] = member_id
+                        fp_out.write(json.dumps(member_doc)+'\n')
             parsed_files.append(fn_out)
             self._close_data_file()
         return parsed_files

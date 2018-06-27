@@ -49,7 +49,7 @@ class ClaimParser(Parser):
                 for claim_line in self._data_handle:
                     claim_line = json.loads(claim_line)
                     member_id = claim_line.pop('memberID')
-                    fp_out.write('{}|{}\n'.format(member_id, claim_line))
+                    fp_out.write('{}|{}\n'.format(member_id, json.dumps(claim_line)))
                 self._close_data_file()
         temp_fn_claim_lines_sorted = './temp_claim_lines_sorted.txt'
         subprocess.call(
@@ -58,6 +58,7 @@ class ClaimParser(Parser):
         )
         os.remove(temp_fn_claim_lines_to_sort)
         merged_claims = self._merge_claim_lines_by_claim_id(temp_fn_claim_lines_sorted)
+        os.remove(temp_fn_claim_lines_sorted)
         return merged_claims
 
     def _merge_claim_lines_by_claim_id(self, claim_lines_sorted_by_member_id):
@@ -67,7 +68,7 @@ class ClaimParser(Parser):
             last_member_id = None
             claim_line_container = []
             for line in fp_in:
-                member_id, claim_line = line.split('|')
+                member_id, claim_line = line.strip().split('|')
                 claim_line = json.loads(claim_line)
                 if self._to_dump_container(member_id, last_member_id):
                     claims = self._clean_up_container(claim_line_container)
@@ -93,7 +94,9 @@ class ClaimParser(Parser):
         for claim_line in claim_line_container:
             if 'claimLine' in claim_line:
                 del claim_line['claimLine']
-            claim_id = claim_line.get('claimID', claim_line['fillID'])  # either claimID or fillID
+            claim_id = claim_line.get('claimID', 'NA')  # either claimID or fillID
+            if claim_id == 'NA':
+                claim_id = claim_line['fillID']
             if claim_id in claims:
                 existing_claim = claims[claim_id]
                 for k, v in claim_line.iteritems():
@@ -112,5 +115,6 @@ class ClaimParser(Parser):
                         existing_claim[k] = v
             else:
                 claims[claim_id] = claim_line
+        claims = [claim for _, claim in claims.iteritems()]
         claims = sorted(claims, key=lambda claim: claim['startDate'])
         return claims

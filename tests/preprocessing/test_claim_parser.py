@@ -39,10 +39,15 @@ def test_inpatient_claim_parser_method_merge_claim_lines(inpatient_claim_parser,
     fn_outs = inpatient_claim_parser.parse_data()
     for fn_out in fn_outs:
         inpatient_claim_parser.add_data_file(fn_out)
-    inpatient_claim_parser.merge_claim_lines()
-    # TODO: temporary tests
-    assert os.path.isfile('./temp_claim_lines_sorted.txt')
-    os.remove('./temp_claim_lines_sorted.txt')
+    claims_by_mid = inpatient_claim_parser.merge_claim_lines()
+    for mid in ['0005EC02F1DC3A15', '000960C9E1C43BE4', '00098CF15837D918']:
+        assert mid in claims_by_mid
+    for i, claim in enumerate(claims_by_mid['0005EC02F1DC3A15']):
+        if i == 0:
+            assert claim['claimID'] == '293491115504906'
+        elif i == 1:
+            assert claim['claimID'] == '293911115441577'
+
     # TODO: test "_merge_claim_lines_by_claim_id", "_to_dump_container" and "_clean_up_container"
 
 def test_inpatient_claim_parser_method_merge_claim_lines_on_wrong_context_format(inpatient_claim_parser,
