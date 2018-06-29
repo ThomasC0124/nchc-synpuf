@@ -36,4 +36,5 @@ class BeneficiarySummaryParser(Parser):
                                         )
                                     )
                                 combined_data[member_id][field] = val
+            os.remove(fn_in)
         return combined_data

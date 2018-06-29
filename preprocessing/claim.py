@@ -48,9 +48,12 @@ class ClaimParser(Parser):
                     continue
                 for claim_line in self._data_handle:
                     claim_line = json.loads(claim_line)
+                    if self._is_data_complete(claim_line) is False:
+                        continue
                     member_id = claim_line.pop('memberID')
                     fp_out.write('{}|{}\n'.format(member_id, json.dumps(claim_line)))
                 self._close_data_file()
+                os.remove(next_data_file)
         temp_fn_claim_lines_sorted = './temp_claim_lines_sorted.txt'
         subprocess.call(
             [self._claim_line_sorting_unix_script, temp_fn_claim_lines_to_sort,
@@ -60,6 +63,13 @@ class ClaimParser(Parser):
         merged_claims = self._merge_claim_lines_by_claim_id(temp_fn_claim_lines_sorted)
         os.remove(temp_fn_claim_lines_sorted)
         return merged_claims
+
+    def _is_data_complete(self, claim_line):
+        """Determine whether `claim_line` is complete"""
+        for k in ['memberID', 'claimID', 'startDate']:
+            if k not in claim_line:
+                return False
+        return True
 
     def _merge_claim_lines_by_claim_id(self, claim_lines_sorted_by_member_id):
         """Merge claim lines already sorted by member ID by claim ID"""
