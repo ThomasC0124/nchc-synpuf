@@ -5,34 +5,36 @@ import logging
 import subprocess
 
 from parser import Parser
+from resource import (
+    inpatient_claim_header,
+    outpatient_claim_header,
+    carrier_claim_header,
+    pde_header
+)
 
 SCRIPT_DIR = os.path.dirname(__file__)
 
 class ClaimParser(Parser):
     _type_header_map = {
-        'inpatient': 'inpatientClaimHeader.json',
-        'outpatient': 'outpatientClaimHeader.json',
-        'carrier': 'carrierClaimHeader.json',
-        'pde': 'prescriptionDrugEventHeader.json'
+        'inpatient': inpatient_claim_header,
+        'outpatient': outpatient_claim_header,
+        'carrier': carrier_claim_header,
+        'pde': pde_header
     }
     _claim_line_sorting_unix_script = os.path.join(SCRIPT_DIR, 'unix_sort.sh')
-    def __init__(self, parser_type, ref_header_fn):
-        super(ClaimParser, self).__init__(ref_header_fn)
-        self.logger = logging.getLogger('ClaimParser')
-        self._check_types(parser_type, ref_header_fn)
-        self._type = parser_type
-        self._load_ref_header()
-        assert self._ref_header is not None, self.logger.error('reference header not loaded')
 
-    def _check_types(self, parser_type, ref_header_fn):
-        """Make sure `parser_type` is supported and correct file name is provided"""
+    def __init__(self, parser_type):
+        super(ClaimParser, self).__init__()
+        self.logger = logging.getLogger('ClaimParser')
         assert parser_type in self._type_header_map, self.logger.error(
             'parser type {} not available'.format(parser_type)
         )
-        header_fn = ntpath.basename(ref_header_fn)
-        assert header_fn == self._type_header_map[parser_type], self.logger.error(
-            'parser type {} does not match header type {}'.format(parser_type, header_fn)
-        )
+        self._load_header(parser_type)
+        assert self._ref_header is not None, self.logger.error('reference header not loaded')
+
+    def _load_header(self, parser_type):
+        """Load JSON-like reference header"""
+        self._ref_header = self._type_header_map[parser_type]
 
     def merge_claim_lines(self):
         """Merge *ALL* claim lines in `self._file_queue`"""
@@ -43,7 +45,9 @@ class ClaimParser(Parser):
                 self._open_data_file(next_data_file)
                 if self._data_handle is None:
                     self.logger.warning(
-                        'skipping the claim line file {} since it can\'t be opened'.format(next_data_file)
+                        'skipping the claim line file {} since it can\'t be opened'.format(
+                            next_data_file
+                        )
                     )
                     continue
                 for claim_line in self._data_handle:

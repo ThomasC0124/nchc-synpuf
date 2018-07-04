@@ -5,20 +5,18 @@ from preprocessing.parser import Parser
 
 logging.basicConfig(level=logging.DEBUG)
 
-def test_instantiate_parser():
-    parser = Parser('./meta_folder/meta_header_ref.json')
+def test_instantiation():
+    parser = Parser()
+    for attr in ['_ref_header']:
+        assert hasattr(parser, attr)
     for method in ['add_data_file', 'pop_data_file', 'remove_data_file', 'parse_data']:
         parser_method = getattr(parser, method, None)
         assert callable(parser_method)
 
 @pytest.fixture
 def parser():
-    parser = Parser('./meta_folder/meta_header_ref.json')
+    parser = Parser()
     return parser
-
-def test_reassign_reference_header(parser, fake_header_fn):
-    with pytest.raises(AttributeError):
-        parser.ref_header_fn = fake_header_fn
 
 def test_add_data_file(parser):
     fake_data_fn = './rawdata/no_such_data_{}.csv'

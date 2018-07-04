@@ -1,0 +1,17 @@
+{
+  "memberID": {
+    "origName": "DESYNPUF_ID"
+  },
+  "fillID": {
+    "origName": "PDE_ID"
+  },
+  "startDate": {
+    "origName": "SRVC_DT"
+  },
+  "ndc": {
+    "origName": "PROD_SRVC_ID"
+  },
+  "daysSupply": {
+    "origName": "DAYS_SUPLY_NUM"
+  }
+}

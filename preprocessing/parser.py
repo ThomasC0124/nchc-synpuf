@@ -6,15 +6,11 @@ import logging
 from collections import deque, defaultdict
 
 class Parser(object):
-    def __init__(self, ref_header_fn):
-        self._ref_header_fn = ref_header_fn
+    def __init__(self):
+        self._ref_header = None
         self._file_queue = deque()
         self._data_handle = None
         self.logger = logging.getLogger('Parser')
-
-    @property
-    def ref_header_fn(self):
-        return self._ref_header_fn
 
     def add_data_file(self, fn_in):
         """Left-append `fn_in` to the processing queue"""
@@ -59,7 +55,7 @@ class Parser(object):
             if self._data_handle is None:
                 self.logger.warning('unable to parse data since data file is not opened')
                 return
-            if not hasattr(self, '_ref_header') or self._ref_header is None:
+            if self._ref_header is None:
                 self.logger.warning(
                     'unable to parse data since the reference header has not yet been loaded'
                 )
@@ -106,13 +102,3 @@ class Parser(object):
         """Add CSV reader buffer onto `fp`"""
         reader = csv.reader(fp, delimiter=delimiter)
         return reader
-
-    # TODO: load header JSONs from the preprocessing module directly and then add them to the parser
-    def _load_ref_header(self):
-        """Load self.ref_header_fn into memory and assign it to self._ref_header"""
-        self._ref_header = None
-        try:
-            with open(self.ref_header_fn, 'r') as fp:
-                self._ref_header = json.load(fp)
-        except IOError as ioe:
-            self.logger.error(ioe, exc_info=True)

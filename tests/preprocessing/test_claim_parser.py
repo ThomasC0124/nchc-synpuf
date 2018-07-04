@@ -8,20 +8,16 @@ from preprocessing import ClaimParser
 logging.basicConfig(level=logging.DEBUG)
 
 @pytest.fixture
-def inpatient_claim_parser(inpatient_claim_header_fn):
-    parser = ClaimParser('inpatient', inpatient_claim_header_fn)
+def inpatient_claim_parser():
+    parser = ClaimParser('inpatient')
     return parser
 
-def test_instantiate_inpatient_claim_parser(inpatient_claim_parser, inpatient_claim_header_fn,
-                                            fake_header_fn):
-    assert hasattr(inpatient_claim_parser, 'ref_header_fn')
-    with pytest.raises(AssertionError):
-        parser = ClaimParser('outpatient', inpatient_claim_header_fn)
-    with pytest.raises(AssertionError):
-        parser = ClaimParser('fake', fake_header_fn)
+def test_instantiation(inpatient_claim_parser):
+    for method in ['merge_claim_lines']:
+        parser_method = getattr(inpatient_claim_parser, method, None)
+        assert callable(parser_method)
 
-def test_inpatient_claim_parser_method_parse_data(inpatient_claim_parser,
-                                                  sample_inpatient_claim_data_fn):
+def test_inpatient_parse_data(inpatient_claim_parser, sample_inpatient_claim_data_fn):
     inpatient_claim_parser.add_data_file(sample_inpatient_claim_data_fn)
     fn_outs = inpatient_claim_parser.parse_data()
     assert len(fn_outs) == 1
@@ -33,8 +29,7 @@ def test_inpatient_claim_parser_method_parse_data(inpatient_claim_parser,
                 assert k in line
     os.remove(fn_outs[0])
 
-def test_inpatient_claim_parser_method_merge_claim_lines(inpatient_claim_parser,
-                                                         sample_inpatient_claim_data_fn):
+def test_inpatient_merge_claim_lines(inpatient_claim_parser, sample_inpatient_claim_data_fn):
     inpatient_claim_parser.add_data_file(sample_inpatient_claim_data_fn)
     fn_outs = inpatient_claim_parser.parse_data()
     for fn_out in fn_outs:
@@ -48,8 +43,8 @@ def test_inpatient_claim_parser_method_merge_claim_lines(inpatient_claim_parser,
         elif i == 1:
             assert claim['claimID'] == '293911115441577'
 
-def test_inpatient_claim_parser_method_merge_claim_lines_on_wrong_context_format(inpatient_claim_parser,
-                                                                                 sample_inpatient_claim_data_fn):
+def test_inpatient_merge_claim_lines_on_wrong_context_format(inpatient_claim_parser,
+                                                             sample_inpatient_claim_data_fn):
     inpatient_claim_parser.add_data_file(sample_inpatient_claim_data_fn)
     with pytest.raises(ValueError):
         inpatient_claim_parser.merge_claim_lines()
