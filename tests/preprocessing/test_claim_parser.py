@@ -38,6 +38,7 @@ def test_inpatient_merge_claim_lines(inpatient_claim_parser, sample_inpatient_cl
     for mid in ['0005EC02F1DC3A15', '000960C9E1C43BE4', '00098CF15837D918']:
         assert mid in claims_by_mid
     for i, claim in enumerate(claims_by_mid['0005EC02F1DC3A15']):
+        assert claim['claimType'] == 'inpatient'
         if i == 0:
             assert claim['claimID'] == '293491115504906'
         elif i == 1:
@@ -51,6 +52,6 @@ def test_inpatient_merge_claim_lines_on_wrong_context_format(inpatient_claim_par
     os.remove('./temp_claim_lines_to_sort.txt')
 
 @pytest.fixture
-def outpatient_claim_parser(outpatient_claim_header_fn):
-    parser = ClaimParser('outpatient', outpatient_claim_header_fn)
+def outpatient_claim_parser():
+    parser = ClaimParser('outpatient')
     return parser

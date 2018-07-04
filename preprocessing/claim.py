@@ -29,12 +29,13 @@ class ClaimParser(Parser):
         assert parser_type in self._type_header_map, self.logger.error(
             'parser type {} not available'.format(parser_type)
         )
-        self._load_header(parser_type)
+        self._parser_type = parser_type
+        self._load_header()
         assert self._ref_header is not None, self.logger.error('reference header not loaded')
 
-    def _load_header(self, parser_type):
+    def _load_header(self):
         """Load JSON-like reference header"""
-        self._ref_header = self._type_header_map[parser_type]
+        self._ref_header = self._type_header_map[self._parser_type]
 
     def merge_claim_lines(self):
         """Merge *ALL* claim lines in `self._file_queue`"""
@@ -129,6 +130,9 @@ class ClaimParser(Parser):
                         existing_claim[k] = v
             else:
                 claims[claim_id] = claim_line
-        claims = [claim for _, claim in claims.iteritems()]
-        claims = sorted(claims, key=lambda claim: claim['startDate'])
+        claim_list = []
+        for _, claim in claims.iteritems():
+            claim['claimType'] = self._parser_type
+            claim_list.append(claim)
+        claims = sorted(claim_list, key=lambda claim: claim['startDate'])
         return claims
