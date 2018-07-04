@@ -33,6 +33,10 @@ class ClaimParser(Parser):
         self._load_header()
         assert self._ref_header is not None, self.logger.error('reference header not loaded')
 
+    def __repr__(self):
+        desc = '<Parser - {} claim parser>'.format(self._parser_type)
+        return desc
+
     def _load_header(self):
         """Load JSON-like reference header"""
         self._ref_header = self._type_header_map[self._parser_type]

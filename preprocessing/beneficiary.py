@@ -18,6 +18,10 @@ class BeneficiarySummaryParser(Parser):
         self._load_header()
         assert self._ref_header is not None, self.logger.error('reference header not loaded')
 
+    def __repr__(self):
+        desc = '<Parser - beneficiary summary>'
+        return desc
+
     def _load_header(self):
         """Load JSON-like reference header"""
         self._ref_header = beneficiary_summary_header

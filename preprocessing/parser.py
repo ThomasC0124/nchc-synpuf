@@ -12,6 +12,10 @@ class Parser(object):
         self._data_handle = None
         self.logger = logging.getLogger('Parser')
 
+    def __repr__(self):
+        desc = '<Parser>'
+        return desc
+
     def add_data_file(self, fn_in):
         """Left-append `fn_in` to the processing queue"""
         self._file_queue.appendleft(fn_in)
