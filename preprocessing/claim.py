@@ -75,9 +75,11 @@ class ClaimParser(Parser):
 
     def _is_data_complete(self, claim_line):
         """Determine whether `claim_line` is complete"""
-        for k in ['memberID', 'claimID', 'startDate']:
+        for k in ['memberID', 'startDate']:
             if k not in claim_line:
                 return False
+        if 'claimID' not in claim_line and 'fillID' not in claim_line:
+            return False
         return True
 
     def _merge_claim_lines_by_claim_id(self, claim_lines_sorted_by_member_id):
