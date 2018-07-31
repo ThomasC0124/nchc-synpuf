@@ -11,11 +11,11 @@ def whether_member_had_tkr(member_med_claims):
 
     Returns:
         had_tkr (bool): whether the member had TKR
-        tkr_claim (dict|None): TKR claim when the member did have TKR; None otherwise
+        tkr_claim_idx (int|None): TKR claim index when the member did have TKR; None otherwise
     """
     had_tkr = False
-    tkr_claim = None
-    for claim in member_med_claims:
+    tkr_claim_idx = None
+    for i, claim in enumerate(member_med_claims):
         claim_drgs = claim.get('DRG', [])
         claim_cpt_procs = claim.get('procedures', [])
         claim_icd_procs = claim.get('procedureICDs', [])
@@ -24,30 +24,28 @@ def whether_member_had_tkr(member_med_claims):
             len(set(['8154', '8155']).intersection(claim_icd_procs)) > 0):
             had_tkr = True
         if had_tkr:
-            tkr_claim = claim.copy()
+            tkr_claim_idx = i
             break
-    return had_tkr, tkr_claim
+    return had_tkr, tkr_claim_idx
 
-def whether_member_was_readmitted(member_med_claims, tkr_claim):
+def whether_tkr_member_was_readmitted(member_med_claims, tkr_claim):
     """Check whether the member who had TKR was readmitted to a hospital within 90 days after TKR
 
     Args:
-        member_med_claims (list): member's medical claims
-        tkr_claim (dict): TKR claim when the member did have TKR; None otherwise
+        member_med_claims (list): TKR member's medical claims
+        tkr_claim (dict): TKR claim in which the member had TKR
 
     Returns:
         was_readmitted (bool): whether the member was readmitted after TKR
-        readmission_claim (dict|None): readmission claim when the member was readmitted;
+        readmission_claim_idx (dict|None): readmission claim index when the member was readmitted;
             None otherwise
     """
     was_readmitted = False
-    readmission_claim = None
-    if tkr_claim is None:
-        return was_readmitted, readmission_claim
+    readmission_claim_idx = None
     tkr_claim_date = datetime.strptime(
         tkr_claim.get('dischargeDate', tkr_claim['endDate']), '%Y%m%d'
     ).date()
-    for claim in member_med_claims:
+    for i, claim in enumerate(member_med_claims):
         # only inpatient claims since it's hospital admission
         if claim['claimType'] != 'inpatient':
             continue
@@ -67,6 +65,6 @@ def whether_member_was_readmitted(member_med_claims, tkr_claim):
                 was_readmitted = True
                 break
         if was_readmitted:
-            readmission_claim = claim.copy()
+            readmission_claim_idx = i
             break
-    return was_readmitted, readmission_claim
+    return was_readmitted, readmission_claim_idx

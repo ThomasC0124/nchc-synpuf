@@ -5,7 +5,10 @@ import argparse
 
 from preprocessing import BeneficiarySummaryParser
 from preprocessing import ClaimParser
-from util import configure_logger
+from util import (
+    configure_logger,
+    save_to_json
+)
 
 def run_beneficiary_summary_parser(sample_num, config, logger):
     """Run beneficiary summary parser"""

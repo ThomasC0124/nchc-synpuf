@@ -14,3 +14,7 @@ def save_to_json(data, fn_out):
     with open(fn_out, 'wb') as fp:
         json.dump(data, fp, indent=2)
 
+def load_json(fn_in):
+    with open(fn_in, 'r') as fp_in:
+        data = json.load(fp_in)
+    return data
