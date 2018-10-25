@@ -83,7 +83,7 @@ if __name__ == '__main__':
     argparser.add_argument('-sn', '--sample_num',
                            help='data sample number', required=True)
     args = argparser.parse_args()
-
+    # TODO: move everything into a "main" function
     logger = logging.getLogger(__name__)
     configure_logger(logger, args.log_fn)
     with open(args.config, 'r') as fp:

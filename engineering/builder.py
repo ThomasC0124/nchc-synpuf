@@ -1,6 +1,6 @@
 import logging
 
-from datetime import datetime, timedelta
+from datetime import datetime
 from collections import Counter
 
 class Builder(object):
@@ -35,7 +35,7 @@ class Builder(object):
                                                                                     num_proc_common)
             )
 
-    def build_matrix(self, json_data):
+    def build_matrix(self, json_data, mode=None):
         header = []
         matrix = []
         if len(self._common_dx_set) == 0 or len(self._common_proc_set) == 0:
@@ -57,6 +57,8 @@ class Builder(object):
                     member_doc['medClaims'][member_doc['tkrClaimIdx']]['startDate'], '%Y%m%d'
                 )
             )
+            # TODO: add "mode" to "build_matrix" so that "_extract_medical" extract different
+            # ranges of claims
             member_medical = self._extract_medical(
                 member_doc, starting_idx=0, ending_idx=member_doc['tkrClaimIdx']
             )
