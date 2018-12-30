@@ -10,6 +10,23 @@ from util import (
     save_to_json
 )
 
+def main(args):
+    logger = logging.getLogger(__name__)
+    configure_logger(logger, args.log_fn)
+    with open(args.config, 'r') as fp:
+        config = json.load(fp)
+
+    sample_beneficiary_summary = run_beneficiary_summary_parser(args.sample_num, config, logger)
+    sample_claims = {}
+    for claim_type in ['inpatient', 'outpatient', 'carrier', 'pde']:
+        claims = run_claim_parser(claim_type, args.sample_num, config[claim_type], logger)
+        sample_claims[claim_type] = claims
+
+    combine_files(sample_beneficiary_summary, sample_claims['inpatient'], sample_claims['outpatient'],
+                  sample_claims['carrier'], sample_claims['pde'])
+
+    save_to_json(sample_beneficiary_summary, config['output'].replace('*', args.sample_num))
+
 def run_beneficiary_summary_parser(sample_num, config, logger):
     """Run beneficiary summary parser"""
     logger.info('Start parsing beneficiary summary sample "{}"...'.format(sample_num))
@@ -82,20 +99,6 @@ if __name__ == '__main__':
                            help='full path to the config file', required=True)
     argparser.add_argument('-sn', '--sample_num',
                            help='data sample number', required=True)
+
     args = argparser.parse_args()
-    # TODO: move everything into a "main" function
-    logger = logging.getLogger(__name__)
-    configure_logger(logger, args.log_fn)
-    with open(args.config, 'r') as fp:
-        config = json.load(fp)
-
-    sample_beneficiary_summary = run_beneficiary_summary_parser(args.sample_num, config, logger)
-    sample_claims = {}
-    for claim_type in ['inpatient', 'outpatient', 'carrier', 'pde']:
-        claims = run_claim_parser(claim_type, args.sample_num, config[claim_type], logger)
-        sample_claims[claim_type] = claims
-
-    combine_files(sample_beneficiary_summary, sample_claims['inpatient'], sample_claims['outpatient'],
-                  sample_claims['carrier'], sample_claims['pde'])
-
-    save_to_json(sample_beneficiary_summary, config['output'].replace('*', args.sample_num))
+    main(args)
