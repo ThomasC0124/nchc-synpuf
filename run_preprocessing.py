@@ -7,25 +7,23 @@ from preprocessing import BeneficiarySummaryParser
 from preprocessing import ClaimParser
 from util import (
     configure_logger,
-    save_to_json
+    load_json
 )
 
 def main(args):
     logger = logging.getLogger(__name__)
     configure_logger(logger, args.log_fn)
-    with open(args.config, 'r') as fp:
-        config = json.load(fp)
+    config = load_json(args.config)
 
-    sample_beneficiary_summary = run_beneficiary_summary_parser(args.sample_num, config, logger)
-    sample_claims = {}
+    beneficiary_summary = run_beneficiary_summary_parser(args.sample_num, config, logger)
+    claim_summary = {}
     for claim_type in ['inpatient', 'outpatient', 'carrier', 'pde']:
         claims = run_claim_parser(claim_type, args.sample_num, config[claim_type], logger)
-        sample_claims[claim_type] = claims
+        claim_summary[claim_type] = claims
 
-    combine_files(sample_beneficiary_summary, sample_claims['inpatient'], sample_claims['outpatient'],
-                  sample_claims['carrier'], sample_claims['pde'])
-
-    save_to_json(sample_beneficiary_summary, config['output'].replace('*', args.sample_num))
+    combine_files(
+        beneficiary_summary, claim_summary, config['output'].replace('*', args.sample_num), logger
+    )
 
 def run_beneficiary_summary_parser(sample_num, config, logger):
     """Run beneficiary summary parser"""
@@ -78,18 +76,30 @@ def run_claim_parser(claim_type, sample_num, raw_data_fns, logger):
     )
     return claims
 
-def combine_files(bene, inp_claims, outp_claims, car_claims, pde_claims):
-    for member_id in bene:
-        member_doc = bene[member_id]
-        member_inp_claims = inp_claims.get(member_id, [])
-        member_outp_claims = outp_claims.get(member_id, [])
-        member_car_claims = car_claims.get(member_id, [])
-        member_doc['medClaims'] = sorted(
-            member_inp_claims+member_outp_claims+member_car_claims,
-            key=lambda claim: claim['startDate']
-        )
-        member_pde_claims = pde_claims.get(member_id, [])
-        member_doc['rxFills'] = member_pde_claims
+def combine_files(beneficiary, claims, output_fn, logger):
+    with open(output_fn, 'wb') as fp:
+        for i, member_id in enumerate(beneficiary.keys()):
+            member_doc = beneficiary.pop(member_id)
+            # medical claims
+            member_inp_claims = claims['inpatient'].pop(member_id, [])
+            member_outp_claims = claims['outpatient'].pop(member_id, [])
+            member_car_claims = claims['carrier'].pop(member_id, [])
+            member_claims = sorted(
+                member_inp_claims+member_outp_claims+member_car_claims,
+                key=lambda claim: claim['startDate']
+            )
+            if len(member_claims) > 0:
+                member_doc['medClaims'] = member_claims
+            # prescription fills
+            member_fills = claims['pde'].pop(member_id, [])
+            if len(member_fills) > 0:
+                member_doc['rxFills'] = member_fills
+
+            fp.write(json.dumps(member_doc)+'\n')
+            if (i+1) % 1000 == 0:
+                logger.info('{} member docs processed'.format(i+1))
+
+    logger.info('{} member docs processed'.format(i+1))
 
 if __name__ == '__main__':
     argparser = argparse.ArgumentParser(description='DE-SynPUF processing program')
