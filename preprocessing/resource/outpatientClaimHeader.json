@@ -15,7 +15,7 @@
     "origName": "CLM_THRU_DT"
   },
   "providerInstitution": {
-    "origName": "PRVDR_NUM"
+    "origName": ["PRVDR_NUM"]
   },
   "attendingPhysician": {
     "origName": "AT_PHYSN_NPI"
