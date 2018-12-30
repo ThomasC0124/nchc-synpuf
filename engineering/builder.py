@@ -35,6 +35,10 @@ class Builder(object):
                                                                                     num_proc_common)
             )
 
+    def find_tkr_relevant_codes(self):
+        # TODO: use ARISE method to look for TKR-relevant codes
+        raise NotImplementedError
+
     def build_matrix(self, json_data, mode=None):
         header = []
         matrix = []

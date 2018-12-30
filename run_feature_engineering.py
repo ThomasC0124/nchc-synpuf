@@ -1,10 +1,11 @@
+import csv
 import argparse
 import logging
 
 from engineering import Builder
 from engineering.util import (
     whether_member_had_tkr,
-    whether_member_was_readmitted
+    whether_tkr_member_was_readmitted
 )
 from util import load_json
 
@@ -46,12 +47,12 @@ def label_readmitted_tkr_members(tkr_members):
         member_doc['readmissionClaimIdx'] = readmission_claim_idx
 
 if __name__ == "__main__":
-    arg_parser = argparse.ArgumentParser(description='')
+    argparser = argparse.ArgumentParser(description='DE-SynPUF feature engineering program')
     argparser.add_argument('json_fn_in', help='full path to the Members_Full JSON file')
     argparser.add_argument('csv_fn_out', help='full path to the CSV file')
     argparser.add_argument('--num_dx', help='number of common Dx codes to look for', required=True)
     argparser.add_argument('--num_proc', help='number of common procedure codes to look for',
-                           required=True)
+                            required=True)
     args = argparser.parse_args()
 
     main(args.json_fn_in, args.num_dx, args.num_proc, args.csv_fn_out)

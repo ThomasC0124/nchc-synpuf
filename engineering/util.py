@@ -60,7 +60,10 @@ def whether_tkr_member_was_readmitted(member_med_claims, tkr_claim):
         if days_admission < 1:
             continue
         for ins in claim['providerInstitution']:
-            ins = int(ins)
+            try:
+                ins = int(ins[:4])
+            except ValueError as ve:
+                continue    # skip codes like '49T0'
             if (1 <= ins <= 839 or 1300 <= ins <= 1399):
                 was_readmitted = True
                 break
