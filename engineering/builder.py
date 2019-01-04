@@ -18,8 +18,8 @@ class Builder(object):
         proc_counter = Counter()
         for member_id, member_doc in json_data.iteritems():
             for claim in member_doc['medClaims']:
-                dx_counter.update(claim['diagnoses'])
-                proc_counter.update(claim['procedures'])
+                dx_counter.update(claim.get('diagnoses', []))
+                proc_counter.update(claim.get('procedures', []))
         for dx, count in dx_counter.most_common(num_dx_common):
             self._common_dx_set.add(dx)
         if len(dx_counter) < num_dx_common:
@@ -39,7 +39,7 @@ class Builder(object):
         # TODO: use ARISE method to look for TKR-relevant codes
         raise NotImplementedError
 
-    def build_matrix(self, json_data, mode=None):
+    def build_matrix(self, json_data):
         header = []
         matrix = []
         if len(self._common_dx_set) == 0 or len(self._common_proc_set) == 0:
@@ -55,14 +55,14 @@ class Builder(object):
             'depression', 'diabetes', 'ischemicHD', 'osteoporosis', 'RAOA', 'stroke'
         ])
         header.extend(list(self._common_dx_set)+list(self._common_proc_set))
+        header.append('readmitted')
         for member_id, member_doc in json_data.iteritems():
             member_demographic = self._extract_demographics(
                 member_doc, datetime.strptime(
                     member_doc['medClaims'][member_doc['tkrClaimIdx']]['startDate'], '%Y%m%d'
                 )
             )
-            # TODO: add "mode" to "build_matrix" so that "_extract_medical" extract different
-            # ranges of claims
+            member_demographic['readmitted'] = int(member_doc['was_readmitted'])
             member_medical = self._extract_medical(
                 member_doc, starting_idx=0, ending_idx=member_doc['tkrClaimIdx']
             )
