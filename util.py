@@ -14,7 +14,14 @@ def save_to_json(data, fn_out):
     with open(fn_out, 'wb') as fp:
         json.dump(data, fp, indent=2)
 
-def load_json(fn_in):
+def load_json(fn_in, multi_lines=False):
+    data = {}
     with open(fn_in, 'r') as fp_in:
-        data = json.load(fp_in)
+        if multi_lines is True:
+            for line in fp_in:
+                line = json.loads(line.strip())
+                member_id = line.pop('memberID')
+                data[member_id] = line
+        else:
+            data = json.load(fp_in)
     return data
