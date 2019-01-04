@@ -95,6 +95,7 @@ def combine_files(beneficiary, claims, output_fn, logger):
             if len(member_fills) > 0:
                 member_doc['rxFills'] = member_fills
 
+            member_doc['memberID'] = member_id
             fp.write(json.dumps(member_doc)+'\n')
             if (i+1) % 1000 == 0:
                 logger.info('{} member docs processed'.format(i+1))
@@ -103,12 +104,9 @@ def combine_files(beneficiary, claims, output_fn, logger):
 
 if __name__ == '__main__':
     argparser = argparse.ArgumentParser(description='DE-SynPUF processing program')
-    argparser.add_argument('-l', '--log_fn',
-                           help='full path to the log file', required=True)
-    argparser.add_argument('-cfg', '--config',
-                           help='full path to the config file', required=True)
-    argparser.add_argument('-sn', '--sample_num',
-                           help='data sample number', required=True)
+    argparser.add_argument('sample_num', help='data sample number')
+    argparser.add_argument('config', help='full path to the config file')
+    argparser.add_argument('log_fn', help='full path to the log file')
 
     args = argparser.parse_args()
     main(args)
