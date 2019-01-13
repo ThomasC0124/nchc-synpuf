@@ -16,7 +16,7 @@ def main(args):
     logger = logging.getLogger(__name__)
     configure_logger(logger, args.log_fn)
 
-    members = load_json(args.json_fn_in)
+    members = load_json(args.json_fn_in, multi_lines=True)
     logging.info('{} members loaded'.format(len(members)))
     tkr_members = filter_out_tkr_members(members)
     logging.info('{} members were found to have TKR in history'.format(len(tkr_members)))

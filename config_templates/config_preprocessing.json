@@ -1,0 +1,19 @@
+{
+  "beneficiary": [
+    "<full path to each beneficiary summary file>"
+  ],
+  "inpatient": [
+    "<full path to each inpatient claim file>"
+  ],
+  "outpatient": [
+    "<full path to each outpatient claim file>"
+  ],
+  "carrier": [
+    "<full path to each carrier claim file>"
+  ],
+  "pde": [
+    "<full path to each prescription drug event file>"
+  ],
+  "output": "<full path to the output JSON>"
+}
+

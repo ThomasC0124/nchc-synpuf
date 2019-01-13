@@ -1,3 +1,4 @@
+import csv
 import json
 import logging
 
@@ -16,7 +17,7 @@ def save_to_json(data, fn_out):
 
 def load_json(fn_in, multi_lines=False):
     data = {}
-    with open(fn_in, 'r') as fp_in:
+    with open(fn_in, 'rb') as fp_in:
         if multi_lines is True:
             for line in fp_in:
                 line = json.loads(line.strip())
@@ -25,3 +26,13 @@ def load_json(fn_in, multi_lines=False):
         else:
             data = json.load(fp_in)
     return data
+
+def load_csv(fn_in):
+    header = []
+    matrix = []
+    with open(fn_in, 'rb') as fp_in:
+        reader = csv.reader(fp_in)
+        header = next(reader)
+        for line in reader:
+            matrix.append(line)
+    return header, matrix
