@@ -2,8 +2,11 @@ import logging
 
 from datetime import datetime
 from collections import Counter
+from sklearn.preprocessing import OneHotEncoder
 
 class Builder(object):
+    data_type_mapping = {'int': int, 'float': float, 'str': str, 'bool': bool}
+
     def __init__(self):
         self.logger = logging.getLogger('Builder')
         self._common_dx_set = set()
@@ -62,7 +65,7 @@ class Builder(object):
                     member_doc['medClaims'][member_doc['tkrClaimIdx']]['startDate'], '%Y%m%d'
                 )
             )
-            member_demographic['readmitted'] = int(member_doc['was_readmitted'])
+            member_demographic['readmitted'] = int(member_doc.get('was_readmitted', False))
             member_medical = self._extract_medical(
                 member_doc, starting_idx=0, ending_idx=member_doc['tkrClaimIdx']
             )
@@ -75,9 +78,7 @@ class Builder(object):
         age = (reference_date-datetime.strptime(member_doc['DOB'], '%Y%m%d')).days/365.25
         gender = (member_doc['gender'] == 'female')
         demographic = {
-            'age': age,
-            'gender': member_doc['gender'],
-            'race': member_doc['race']
+            'age': age, 'gender': int(gender), 'race': member_doc['race']
         }
         # cc stands for chronic condition
         for cc in [
@@ -85,7 +86,7 @@ class Builder(object):
             'ischemicHD', 'osteoporosis', 'RAOA', 'stroke'
         ]:
             has_status = max(member_doc.get(cc, {'cc': 0}).values())==1
-            demographic[cc] = has_status
+            demographic[cc] = int(has_status)
         return demographic
 
     def _extract_medical(self, member_doc, starting_idx, ending_idx):

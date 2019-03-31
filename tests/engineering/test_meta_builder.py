@@ -46,7 +46,7 @@ def test_extract_demographics(fake_json_data):
         assert demographics['age'] == (
             reference_date-datetime.strptime(member_doc['DOB'], '%Y%m%d')
         ).days/365.25
-        assert demographics['gender'] == member_doc['gender']
+        assert demographics['gender'] == int(member_doc['gender']=='female')
         assert demographics['race'] == member_doc['race']
 
 def test_extract_medical(fake_json_data):
@@ -70,5 +70,5 @@ def test_build_matrix(fake_json_data):
     builder.find_common_codes(fake_json_data, num_dx_common, num_proc_common)
 
     header, matrix = builder.build_matrix(fake_json_data)
-    assert len(header) == 15+len(builder._common_dx_set)+len(builder._common_proc_set)
+    assert len(header) == 16+len(builder._common_dx_set)+len(builder._common_proc_set)
     assert len(matrix) == 2

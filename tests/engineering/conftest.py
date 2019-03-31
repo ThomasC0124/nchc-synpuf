@@ -55,4 +55,4 @@ def fake_json_data():
             ]
         }
     }
-    return json_data
+    yield json_data
